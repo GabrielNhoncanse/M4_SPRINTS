@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include <ctype.h> //biblioteca usada no exercício 5 (tolower)
+#include <ctype.h> //biblioteca usada na função leComando (tolower)
 #include <vector>
 
 int converteSensor(float &valor, float &minimo, float &maximo)
@@ -33,25 +33,46 @@ int leituraSensor(int min, int max)
 	return valInserido;
 }
 
-// 3 -  Implemente a função 'armazenaVetor' que receberá 4 argumentos: o
-// ponteiro do vetor que receberá a medida, o tamanho do vetor, a posição atual para armazenamento
-// e a medida para ser armazenada no vetor. A função deve armazenar a medida no vetor, segundo
-// posição indicada (posição atual) e retornar a próxima posição para armazenamento futuro.
-void armazenaVetor(int tamanho, int posicao, int medida)
+int armazenaVetor(int *vetor, int tamanho, int posicao, int medida)
 {
-	// std::cout << tamanho << posicao << medida;
+	if (posicao < tamanho)
+	{
+		vetor[posicao] = medida;
+		return posicao + 1;
+	}
+	else
+	{
+		return posicao;
+	}
 }
 
-// 4. Implemente a função 'direcaoMenorCaminho' que receberá 2 argumentos: (1) o
-// ponteiro para um vetor e (2) o ponteiro para uma variável. Esta função deve avaliar 4
-// valores do vetor, a partir do ponteiro (1) recebido. Os 4 valores representam as distâncias
-// nos sentidos: Direta, Esquerda, Frente e Trás (esses valores foram inseridos com a função
-//'leituraSensor', convertidos com a função 'converteSensor' e armazenados no vetor com a
-// função 'armazenaVetor'). Esta função retorna o sentido de maior distância, e com base no
-// ponteiro (2) para a variável, nela armazena o valor da maior distância.
-
-void direcaoMenorCaminho()
+char direcaoMenorCaminho(int *vetor, int &maiorDis)
 {
+	int maiorValor = vetor[0];
+	for (int i = 0; i < 4; i++)
+	{
+		if (maiorValor < vetor[i])
+		{
+			maiorValor = vetor[i];
+			switch (i)
+			{
+			case 1:
+				return 'E';
+				break;
+			case 2:
+				return 'F';
+				break;
+			case 3:
+				return 'T';
+				break;
+
+			default:
+				return 'D';
+				break;
+			}
+		}
+	}
+	maiorDis = maiorValor;
 }
 
 int leComando()
@@ -86,67 +107,6 @@ int leComando()
 	}
 }
 
-// 6 - A função abaixo (que está incompleta) vai "dirigindo" virtualmente um robô
-// e através de 4 sensores em cada um dos 4 pontos do robo ("Direita", "Esquerda",
-// "Frente", "Tras").
-//      A cada passo, ele verifica as distâncias aos objetos e vai mapeando o terreno
-// para uma movimentação futura.
-//      Ele vai armazenando estas distancias em um vetor fornecido como parâmetro
-// e retorna a ultima posicao preenchida do vetor.
-//      Esta função deve ir lendo os 4 sensores até que um comando de pare seja enviado
-//
-//      Para simular os sensores e os comandos de pare, use as funções já construídas
-// nos ítens anteriores e em um looping contínuo até que um pedido de parada seja
-// enviado pelo usuário.
-//
-//      Complete a função com a chamada das funções já criadas
-// int dirige(int *v, int maxv)
-// {
-// 	int maxVetor = maxv;
-// 	int *vetorMov = v;
-// 	int posAtualVetor = 0;
-// 	int dirigindo = 1;
-// 	while (dirigindo)
-// 	{
-// 		int medida = /// .. Chame a função de de leitura da medida para a "Direita"
-// 			medida = converteSensor(medida, 0, 830);
-// 		posAtualVetor = // Chame a função para armazenar a medida no vetor
-// 						///////////////////////////////////////////////////////////////////////////
-// 			// Repita as chamadas acima para a "Esquerda", "Frente", "Tras"
-// 			// ................
-// 			///////////////////////////////////////////////////////////////////////////
-// 			dirigindo = leComando();
-// 	}
-// 	return posAtualVetor;
-// }
-
-// // O trecho abaixo irá utilizar as funções acima para ler os sensores e o movimento
-// // do robô e no final percorrer o vetor e mostrar o movimento a cada direção baseado
-// // na maior distância a cada movimento
-// void percorre(int *v, int tamPercorrido)
-// {
-// 	int *vetorMov = v;
-// 	int maiorDir = 0;
-
-// 	for (int i = 0; i < tamPercorrido; i += 4)
-// 	{
-// 		char *direcao = direcaoMenorCaminho(&(vetorMov[i]), &maiorDir);
-// 		printf("Movimentando para %s distancia = %i\n", direcao, maiorDir);
-// 	}
-// }
-
-// int main(int argc, char **argv)
-// {
-// 	int maxVetor = 100;
-// 	int vetorMov[maxVetor * 4];
-// 	int posAtualVet = 0;
-
-// 	posAtualVet = dirige(vetorMov, maxVetor);
-// 	percorre(vetorMov, posAtualVet);
-
-// 	return 0;
-// }
-
 int main()
 {
 
@@ -177,20 +137,19 @@ int main()
 	converteSensor(valor, minimo, maximo);
 	leituraSensor(minimo, maximo);
 
-	int ponteiroVetor;
-	int tamanhoVetor;
+	int tamanhoVetor = 100;
 	int posicao;
 	int medida;
+	int vetor[400];
 
-	// std::cout << "Indique o ponteiro do vetor:";
-	// std::cin >> ponteiroVetor;
-	std::cout << "Indique o tamanho do vetor:";
-	std::cin >> tamanhoVetor;
 	std::cout << "Indique a posição a ser inserido o valor:";
 	std::cin >> posicao;
 	std::cout << "Indique a medida a ser inserida no vetor:";
 	std::cin >> medida;
-	armazenaVetor(tamanhoVetor, posicao, medida);
+	armazenaVetor(vetor, tamanhoVetor, posicao, medida);
+
+	int maiorDis;
+	direcaoMenorCaminho(vetor, maiorDis);
 
 	leComando();
 
